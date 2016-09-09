@@ -1,0 +1,22 @@
+# RDF bem básico sobre doenças e sintomas médicos
+# Marcio Gomes
+
+<disease:pneumonia> <http://health-lifesci.schema.org/name> "Pneumonia" .
+<disease:pneumonia> <http://health-lifesci.schema.org/description> "Infecção que irrita os sacos de ar em um ou ambos os pulmões, que podem se encher de líquido." .
+<disease:pneumonia> <http://health-lifesci.schema.org/cause> <cause:tosse> .
+<disease:pneumonia> <http://health-lifesci.schema.org/cause> <cause:febre> .
+<disease:pneumonia> <http://health-lifesci.schema.org/drug> <drug:ciprofloxacin> .
+
+<disease:sinusite> <http://health-lifesci.schema.org/name> "Sinusite" .
+<disease:sinusite> <http://health-lifesci.schema.org/cause> <cause:tosse> .
+
+<disease:bronquite> <http://health-lifesci.schema.org/name> "Bronquite" .
+<disease:bronquite> <http://health-lifesci.schema.org/cause> <cause:febre> .
+
+<cause:tosse> <http://health-lifesci.schema.org/name> "Tosse" .
+<cause:tosse> <http://health-lifesci.schema.org/description> "Tosse com catarro" .
+
+<cause:febre> <http://health-lifesci.schema.org/name> "Febre" .
+<cause:febre> <http://health-lifesci.schema.org/description> "Aumento anormal da temperatura média corporal" .
+
+<drug:ciprofloxacin> <http://health-lifesci.schema.org/name> "Ciprofloxacin" .
