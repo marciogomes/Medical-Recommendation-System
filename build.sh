@@ -3,4 +3,4 @@
 export PATH=$PATH:/usr/local/go/bin
 #export GOPATH=$HOME/Desktop/Medical-Recommendation-System
 
-go build github.com/marciogomes/main
+go build -o main.a github.com/marciogomes/main
