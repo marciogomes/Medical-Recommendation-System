@@ -1,3 +1,5 @@
+/* Server Mux */
+
 package main
 
 import (
@@ -5,6 +7,8 @@ import (
   "log"
   "net/http"
   "html/template"
+  "strings"
+  "strconv"
 
   "github.com/marciogomes/kg"
   "github.com/cayleygraph/cayley"
@@ -31,15 +35,26 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
     }
     t.Execute(w, nil)
   } else {
-    value := r.FormValue("body")
-    fmt.Println("Novo sintoma inserido: " + value)
-    sintomas = append(sintomas, value)
-    http.Redirect(w, r, "/edit/edit.html", http.StatusFound)
+    action := r.URL.Path[len("/edit/"):]
+    if action == "symptoms" {
+      value := r.FormValue("body")
+      log.Println("Novo sintoma inserido: " + value)
+      sintomas = append(sintomas, value)
+      http.Redirect(w, r, "/edit/symptoms.html", http.StatusFound)
+    } else if action == "signals" {
+      fmt.Println(r.FormValue("temperature"))
+      fmt.Println(r.FormValue("pressure"))
+      http.Redirect(w, r, "/edit/signals.html", http.StatusFound)
+    } else if action == "habits" {
+      fmt.Println(r.FormValue("fuma"))
+      http.Redirect(w, r, "/edit/habits.html", http.StatusFound)
+    }
   }
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
   fmt.Println(sintomas)
+
   tmpl := r.URL.Path[len("/view/"):]
   t, err := template.ParseFiles("tmpl/" + tmpl)
   if err != nil {
@@ -49,16 +64,38 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func resultsHandler(w http.ResponseWriter, r *http.Request) {
-  fmt.Println(sintomas)
+
   tmpl := r.URL.Path[len("/results/"):]
   t, err := template.ParseFiles("tmpl/" + tmpl)
   if err != nil {
     log.Fatalln(err)
   }
 
-  doencas := kg.Query(store, sintomas)
+  results := kg.Query(store, sintomas)
 
-  t.Execute(w, doencas)
+  /* fazer um metodo para filtragem */
+  var diagnosticos map[string]int
+  var resultsSet map[string]bool
+  diagnosticos = make(map[string]int)
+  resultsSet = make(map[string]bool)
+
+  for i := range results {
+    diagnosticos[results[i]]++
+  }
+
+  var resposta []string
+  var aux string
+
+  for i := range results {
+    if resultsSet[results[i]] == false {
+      resposta = append(resposta, results[i] + " ocorrencias = " + strconv.Itoa(diagnosticos[results[i]]) + " probabilidade = " + strconv.FormatFloat(float64(diagnosticos[results[i]])/float64(len(results)), 'f', 6, 64))
+      resultsSet[results[i]] = true
+    }
+  }
+
+  aux = strings.Join(resposta, " - ")
+
+  t.Execute(w, aux)
 }
 
 func main() {
@@ -68,5 +105,7 @@ func main() {
   http.HandleFunc("/edit/", editHandler)
   http.HandleFunc("/view/", viewHandler)
   http.HandleFunc("/results/", resultsHandler)
+  http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
+  http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("img/"))))
   http.ListenAndServe(":8080", nil)
 }

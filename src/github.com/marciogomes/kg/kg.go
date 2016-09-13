@@ -1,3 +1,5 @@
+/* Knowledge Graph */
+
 package kg
 
 import (
@@ -39,7 +41,7 @@ func Query(store *cayley.Handle, sintomas []string) []string {
   // fazendo o caminho
 
   for i := range sintomas {
-    p := cayley.StartPath(store, quad.IRI(sintomas[i])).In(quad.IRI("http://health-lifesci.schema.org/cause"))
+    p := cayley.StartPath(store, quad.IRI(sintomas[i])).In(quad.IRI("https://health-lifesci.schema.org/MedicalSignOrSymptom"))
 
     err := p.Iterate(nil).EachValue(nil, func(value quad.Value) {
   		nativeValue := quad.NativeOf(value)

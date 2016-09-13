@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+    <title>Inserir sinais</title>
+  </head>
+  <body>
+    <h1>Temperatura</h1>
+    <form action="/edit/signals" method="post">
+      <div><input type="number" step="0.1" name="temperature" value="36"></div>
+    <h1>Pressão</h1>
+      <div><input type="text" name="pressure"></div>
+      <div><input type="submit" value="Salvar" onClick="alert('Dados inseridos com sucesso!')"></div>
+    </form>
+    <br>
+    <a href="/home/home.html">&#8592; Voltar a home</a>
+  </body>
+</html>

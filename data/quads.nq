@@ -1,22 +1,71 @@
-# RDF bem básico sobre doenças e sintomas médicos
-# Marcio Gomes
+# Arquivo .nq contendo a descrição dos sintomas, sinais e diagnósticos
+# Sistema de Auxílio Médico para Diagnósticos
+# Luis Henrique Meazzini Sepulvene, Márcio Aduil Gomes Júnior
 
-<disease:pneumonia> <http://health-lifesci.schema.org/name> "Pneumonia" .
-<disease:pneumonia> <http://health-lifesci.schema.org/description> "Infecção que irrita os sacos de ar em um ou ambos os pulmões, que podem se encher de líquido." .
-<disease:pneumonia> <http://health-lifesci.schema.org/cause> <cause:tosse> .
-<disease:pneumonia> <http://health-lifesci.schema.org/cause> <cause:febre> .
-<disease:pneumonia> <http://health-lifesci.schema.org/drug> <drug:ciprofloxacin> .
+<MedicalCondition:pneumonia> <http://health-lifesci.schema.org/name> "Pneumonia" .
+<MedicalCondition:pneumonia> <http://health-lifesci.schema.org/description> "Infecção que irrita os sacos de ar em um ou ambos os pulmões, que podem se encher de líquido" .
+<MedicalCondition:pneumonia> <http://health-lifesci.schema.org/code> <MedicalCode:J18> .
 
-<disease:sinusite> <http://health-lifesci.schema.org/name> "Sinusite" .
-<disease:sinusite> <http://health-lifesci.schema.org/cause> <cause:tosse> .
+<MedicalCode:J18> <http://health-lifesci.schema.org/name> "Pneumonia por microorganismo não especificada" .
+<MedicalCode:J18> <http://health-lifesci.schema.org/codeValue> "J18" .
+<MedicalCode:J18> <http://health-lifesci.schema.org/codingSystem> "CID-10" .
 
-<disease:bronquite> <http://health-lifesci.schema.org/name> "Bronquite" .
-<disease:bronquite> <http://health-lifesci.schema.org/cause> <cause:febre> .
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalRiskFactor> <MedicalRiskFactor:fumo> .
 
-<cause:tosse> <http://health-lifesci.schema.org/name> "Tosse" .
-<cause:tosse> <http://health-lifesci.schema.org/description> "Tosse com catarro" .
+<MedicalRiskFactor:fumo> <http://health-lifesci.schema.org/name> "Fumo" .
+<MedicalRiskFactor:fumo> <http://health-lifesci.schema.org/increasesRiskOf> <MedicalCondition:pneumonia> .
+<MedicalRiskFactor:fumo> <http://health-lifesci.schema.org/MedicalCode> <MedicalCode:F17> .
 
-<cause:febre> <http://health-lifesci.schema.org/name> "Febre" .
-<cause:febre> <http://health-lifesci.schema.org/description> "Aumento anormal da temperatura média corporal" .
+<MedicalCode:F17> <http://health-lifesci.schema.org/name> "Transtornos mentais e comportamentais devidos ao uso de fumo" .
+<MedicalCode:F17> <http://health-lifesci.schema.org/codeValue> "F17" .
+<MedicalCode:F17> <http://health-lifesci.schema.org/codingSystem> "CID-10" .
 
-<drug:ciprofloxacin> <http://health-lifesci.schema.org/name> "Ciprofloxacin" .
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalRiskFactor> <MedicalRiskFactor:alcool> .
+
+<MedicalRiskFactor:alcool> <http://health-lifesci.schema.org/name> "Álcool" .
+<MedicalRiskFactor:alcool> <http://health-lifesci.schema.org/increasesRiskOf> <MedicalCondition:pneumonia> .
+<MedicalRiskFactor:alcool> <http://health-lifesci.schema.org/MedicalCode> <MedicalCode:F10> .
+
+<MedicalCode:F10> <http://health-lifesci.schema.org/name> "Transtornos mentais e comportamentais devidos ao uso de álcool" .
+<MedicalCode:F10> <http://health-lifesci.schema.org/codeValue> "F10" .
+<MedicalCode:F10> <http://health-lifesci.schema.org/codingSystem> "CID-10" .
+
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalRiskFactor> <MedicalRiskFactor:arcondicionado> .
+
+<MedicalRiskFactor:arCondicionado> <http://health-lifesci.schema.org/name> "Ar Condicionado" .
+<MedicalRiskFactor:arCondicionado> <http://health-lifesci.schema.org/increasesRiskOf> <MedicalCondition:pneumonia> .
+
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalRiskFactor> <MedicalRiskFactor:resfriado> .
+
+<MedicalRiskFactor:resfriado> <http://health-lifesci.schema.org/name> "Resfriado" .
+<MedicalRiskFactor:resfriado> <http://health-lifesci.schema.org/increasesRiskOf> <MedicalCondition:pneumonia> .
+<MedicalRiskFactor:resfriado> <http://health-lifesci.schema.org/MedicalCode> <MedicalCode:J00> .
+
+<MedicalCode:J00> <http://health-lifesci.schema.org/name> "J00 - Nasofaringite aguda (resfriado comum)" .
+<MedicalCode:J00> <http://health-lifesci.schema.org/codeValue> "J00" .
+<MedicalCode:J00> <http://health-lifesci.schema.org/codingSystem> "CID-10" .
+
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalRiskFactor> <MedicalRiskFactor:temperaturaReduzida> .
+
+<MedicalRiskFactor:temperaturaReduzida> <http://health-lifesci.schema.org/name> "Temperatura Reduzida" .
+<MedicalRiskFactor:temperaturaReduzida> <http://health-lifesci.schema.org/increasesRiskOf> <MedicalCondition:pneumonia> .
+<MedicalRiskFactor:temperaturaReduzida> <http://health-lifesci.schema.org/MedicalCode> <MedicalCode:T69> .
+
+<MedicalCode:T69> <http://health-lifesci.schema.org/name> "Outros efeitos da temperatura reduzida" .
+<MedicalCode:T69> <http://health-lifesci.schema.org/codeValue> "T69" .
+<MedicalCode:T69> <http://health-lifesci.schema.org/codingSystem> "CID-10" .
+
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalSignOrSymptom> <MedicalSignOrSymptom:febreAlta> .
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalSignOrSymptom> <MedicalSignOrSymptom:tosse> .
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalSignOrSymptom> <MedicalSignOrSymptom:alteracaoPressãoArterial> .
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalSignOrSymptom> <MedicalSignOrSymptom:dorToraxica> .
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalSignOrSymptom> <MedicalSignOrSymptom:confusaoMental> .
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalSignOrSymptom> <MedicalSignOrSymptom:malEstar> .
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalSignOrSymptom> <MedicalSignOrSymptom:faltaDeAr> .
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalSignOrSymptom> <MedicalSignOrSymptom:secrecaoMuco> .
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalSignOrSymptom> <MedicalSignOrSymptom:toxemia>  .
+<MedicalCondition:pneumonia> <https://health-lifesci.schema.org/MedicalSignOrSymptom> <MedicalSignOrSymptom:fraqueza>  .
+
+<MedicalSignOrSymptom:febreAlta> <http://health-lifesci.schema.org/name> "Febre Alta" .
+
+<MedicalCondition:sinusite> <https://health-lifesci.schema.org/MedicalSignOrSymptom> <MedicalSignOrSymptom:febreAlta> .
