@@ -1,21 +1,49 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="../css/style.css">
-    <title>Home</title>
-  </head>
-  <body>
-    <img src="../img/logoUnifei.gif" alt="Logo Unifei" style="float:right; margin: 10px 10px 0 10px; width: 100px; height: 100px;">
-    <h1>Sistema de auxílio médico para diagnósticos</h1>
-    <p>Trabalho de conclusão de curso realizado por <b>Márcio Gomes</b> e <b>Luis Meazzini</b></p>
-    <hr>
-    <a href="/edit/symptoms.html">Inserir sintomas</a><br>
-    <a href="/edit/signals.html">Inserir sinais</a><br>
-    <a href="/edit/habits.html">Inserir hábitos do paciente</a><br>
-    <a href="/view/view.html">Ver dados</a><br>
-    <a href="/results/results.html">Ver possiveis doencas</a>
-    <br><br>
-    <i>UNIFEI - 2016</i>
-  </body>
+<html lang="en">
+<head>
+	<title>Home</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial=scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+	<div class="container">
+
+		<div class="page-header">
+			<a href="/home/home.html"><h1>Dirac <small>beta</small></h1></a>
+			<p>Sistema de auxílio médico para diagnósticos</p>
+		</div>
+
+		<div class="alert alert-warning fade in">
+			<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+			<span class="glyphicon glyphicon-warning-sign"></span> <b>Atenção!</b> É necessário um profissional da área médica para o diagnóstico final
+		</div>
+
+		<div class="row">
+			<div class="col-sm-2">
+				<div class="dropdown">
+					<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+						<span class="glyphicon glyphicon-menu-hamburger"></span> Menu
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="/edit/register.html">Cadastrar paciente</a></li>
+						<li><a href="/edit/signals.html">Triagem</a></li>
+						<li><a href="/edit/symptom.html">Inserir sintomas</a></li>
+						<li><a href="/results/results.html">Ficha do paciente</a></li>
+						<li class="divider"></li>
+						<li><a href="/home/about.html">Sobre</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="col-sm-10">
+				<h1>Página inicial</h1>
+				<p>Bem-vindo ao sistema de auxílio médico para diagnósticos!</p>
+				<p>Para começar, selecione alguma ação no menu ao lado</p>
+			</div>
+		</div>
+
+	</div>
+</body>
 </html>

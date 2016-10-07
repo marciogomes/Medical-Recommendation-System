@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>{{.Name}}</title>
+	<title>Sobre</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial=scale=1">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -24,46 +24,18 @@
 					</button>
 					<ul class="dropdown-menu">
 						<li><a href="/edit/register.html">Cadastrar paciente</a></li>
-						<li><a href="/edit/signals.html">Inserir sinais</a></li>
+						<li><a href="/edit/signals.html">Triagem</a></li>
 						<li><a href="/edit/symptom.html">Inserir sintomas</a></li>
-						<li><a href="/results/results.html">Gerar ficha do paciente</a></li>
+						<li><a href="/results/results.html">Ficha do paciente</a></li>
 						<li class="divider"></li>
 						<li><a href="/home/about.html">Sobre</a></li>
 					</ul>
 				</div>
 			</div>
 			<div class="col-sm-10">
-				<h1>{{.Name}} <small>CID-10 {{.Code}}</small></h1>
-				<p>{{.Description}}</p>
-
-				<img src="{{.Image}}" alt="Imagem de {{.Name}}" class="img-responsive center-block">
-				
-				<div class="row">
-					<div class="col-sm-6">
-						<h3>Sintomas</h3>
-						<ul class="list-group">
-						{{range .Sintomas}}
-							<li class="list-group-item">{{.}}</li>
-						{{end}}
-						</ul>
-					</div>
-					<div class="col-sm-6">
-						<h3>Fatores de risco</h3>
-						<ul class="list-group">
-						{{range .RiskFactors}}
-							<li class="list-group-item">{{.}}</li>
-						{{end}}
-						</ul>
-
-						<h3>Drogas</h3>
-						<ul class="list-group">
-						{{range .Drugs}}
-							<li class="list-group-item">{{.}}</li>
-						{{end}}
-						</ul>
-					</div>
-				</div>
-
+				<h1>Sobre</h1>
+				<p>Trabalho de conclusão de curso realizado por Márcio Gomes e Luis Meazzini orientado por Andre Bernardi.</p>
+				<p>Universidade Federal de Itajubá, 2016.</p>
 			</div>
 		</div>
 

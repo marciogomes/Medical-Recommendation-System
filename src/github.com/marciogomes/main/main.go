@@ -3,109 +3,151 @@
 package main
 
 import (
-  "fmt"
-  "log"
-  "net/http"
-  "html/template"
-  "strings"
-  "strconv"
+	"fmt"
+	"log"
+	"net/http"
+	"html/template"
+	"strconv"
+	"strings"
 
-  "github.com/marciogomes/kg"
-  "github.com/cayleygraph/cayley"
+	"github.com/marciogomes/kg"
+	"github.com/cayleygraph/cayley"
 )
 
 var store *cayley.Handle
-var sintomas []string
+
+var TodosSintomas []string
+
+type Paciente struct {
+	Name, DateBirth, CidadeAtual string
+	Sintomas, RiskFactors, Diagnosticos []string
+}
+
+var p Paciente
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-  tmpl := r.URL.Path[len("/home/"):]
-  t, err := template.ParseFiles("tmpl/" + tmpl)
-  if err != nil {
-    log.Fatalln(err)
-  }
-  t.Execute(w, nil)
+	tmpl := r.URL.Path[len("/home/"):]
+	t, err := template.ParseFiles("tmpl/" + tmpl)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	t.Execute(w, nil)
 }
 
 func editHandler(w http.ResponseWriter, r *http.Request) {
-  if r.Method == "GET" {
-    tmpl := r.URL.Path[len("/edit/"):]
-    t, err := template.ParseFiles("tmpl/" + tmpl)
-    if err != nil {
-      log.Fatalln(err)
-    }
-    t.Execute(w, nil)
-  } else {
-    action := r.URL.Path[len("/edit/"):]
-    if action == "symptoms" {
-      value := r.FormValue("body")
-      log.Println("Novo sintoma inserido: " + value)
-      sintomas = append(sintomas, value)
-      http.Redirect(w, r, "/edit/symptoms.html", http.StatusFound)
-    } else if action == "signals" {
-      fmt.Println(r.FormValue("temperature"))
-      fmt.Println(r.FormValue("pressure"))
-      http.Redirect(w, r, "/edit/signals.html", http.StatusFound)
-    } else if action == "habits" {
-      fmt.Println(r.FormValue("fuma"))
-      http.Redirect(w, r, "/edit/habits.html", http.StatusFound)
-    }
-  }
-}
+	if r.Method == "GET" {
+		tmpl := r.URL.Path[len("/edit/"):]
+		t, err := template.ParseFiles("tmpl/" + tmpl)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		t.Execute(w, TodosSintomas)
+	} else {
+		action := r.URL.Path[len("/edit/"):]
+		if action == "register" {
 
-func viewHandler(w http.ResponseWriter, r *http.Request) {
-  fmt.Println(sintomas)
+			p.Name = r.FormValue("name")
+			p.DateBirth = r.FormValue("dateBirth");
+			p.CidadeAtual = r.FormValue("city");
+			value := r.FormValue("fuma")
+			if value == "Fumante" {
+				log.Println("Novo habito inserido: " + value)
+				p.RiskFactors = append(p.RiskFactors, "Fumo")
+			}
 
-  tmpl := r.URL.Path[len("/view/"):]
-  t, err := template.ParseFiles("tmpl/" + tmpl)
-  if err != nil {
-    log.Fatalln(err)
-  }
-  t.Execute(w, sintomas)
+			log.Println("Paciente: " + p.Name)
+			log.Println("Data Nascimento: " + p.DateBirth)
+			log.Println("Cidade Atual: " + p.CidadeAtual)
+
+			http.Redirect(w, r, "/edit/register.html", http.StatusFound)
+
+		} else if action == "symptom" {
+
+			value := r.FormValue("body")
+			log.Println("Novo sintoma inserido: " + value)
+			p.Sintomas = append(p.Sintomas, value)
+
+			test := convertToList(p.Sintomas)
+			w.Write([]byte(test))
+
+		} else if action == "signals" {
+
+			fmt.Println(r.FormValue("temperature"))
+			fmt.Println(r.FormValue("pressure"))
+
+		}
+	}
 }
 
 func resultsHandler(w http.ResponseWriter, r *http.Request) {
 
-  tmpl := r.URL.Path[len("/results/"):]
-  t, err := template.ParseFiles("tmpl/" + tmpl)
-  if err != nil {
-    log.Fatalln(err)
-  }
+	tmpl := r.URL.Path[len("/results/"):]
+	t, err := template.ParseFiles("tmpl/" + tmpl)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-  results := kg.Query(store, sintomas)
+	results := kg.QuerySymptom(store, kg.QueryIRIs(store, p.Sintomas))
+	// ... -> variadic funcion. para appendar duas []string
+	results = append(results, kg.QueryRiskFactor(store, kg.QueryIRIs(store, p.RiskFactors))...)
 
-  /* fazer um metodo para filtragem */
-  var diagnosticos map[string]int
-  var resultsSet map[string]bool
-  diagnosticos = make(map[string]int)
-  resultsSet = make(map[string]bool)
+	resultsName := kg.QueryNames(store, results)
 
-  for i := range results {
-    diagnosticos[results[i]]++
-  }
+  	/* fazer um metodo para filtragem */
+	var ocorrencias map[string]int
+	var resultsSet map[string]bool
+	ocorrencias = make(map[string]int)
+	resultsSet = make(map[string]bool)
 
-  var resposta []string
-  var aux string
+	for i := range resultsName {
+		ocorrencias[resultsName[i]]++
+	}
 
-  for i := range results {
-    if resultsSet[results[i]] == false {
-      resposta = append(resposta, results[i] + " ocorrencias = " + strconv.Itoa(diagnosticos[results[i]]) + " probabilidade = " + strconv.FormatFloat(float64(diagnosticos[results[i]])/float64(len(results)), 'f', 6, 64))
-      resultsSet[results[i]] = true
-    }
-  }
+	p.Diagnosticos = nil; // melhorar isso, ao inves de string usar map[string]float
 
-  aux = strings.Join(resposta, " - ")
+	for i := range resultsName {
+		if resultsSet[resultsName[i]] == false {
+			p.Diagnosticos = append(p.Diagnosticos, resultsName[i] + "-" + strconv.FormatFloat(float64(ocorrencias[resultsName[i]]) / float64(len(resultsName)) * 100.0, 'f', 2, 64))
+			resultsSet[resultsName[i]] = true
+		}
+	}
 
-  t.Execute(w, aux)
+	t.Execute(w, p)
+}
+
+func viewHandler(w http.ResponseWriter, r *http.Request) {
+	req := r.URL.Path[len("/view/"):]
+	busca := strings.Split(req, "-")
+
+	t, err := template.ParseFiles("tmpl/view.html")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	var result kg.Doenca
+	result = kg.QueryDoenca(store, kg.QueryIRI(store, busca[0]))
+	t.Execute(w, result)
+}
+
+func convertToList(terms []string) string{
+	var res string
+	res = "<h2>Sintomas inseridos</h2>\n<ul class=\"list-group\">\n"
+	for i := range terms {
+		res = res + "<li class=\"list-group-item\">" + terms[i] + "</li>\n"
+	}
+	res = res + "</ul>";
+	return res
 }
 
 func main() {
-  store = kg.Init()
 
-  http.HandleFunc("/home/", homeHandler)
-  http.HandleFunc("/edit/", editHandler)
-  http.HandleFunc("/view/", viewHandler)
-  http.HandleFunc("/results/", resultsHandler)
-  http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
-  http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("img/"))))
-  http.ListenAndServe(":8080", nil)
+	store = kg.Init()
+
+	TodosSintomas = kg.QueryAll(store)
+
+	http.HandleFunc("/home/", homeHandler)
+	http.HandleFunc("/edit/", editHandler)
+	http.HandleFunc("/results/", resultsHandler)
+	http.HandleFunc("/view/", viewHandler)
+	//http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
+	http.ListenAndServe(":8080", nil)
 }

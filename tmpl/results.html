@@ -1,14 +1,136 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="../css/style.css">
-    <title>Resultados</title>
-  </head>
-  <body>
-    <h1>Possiveis diagnósticos</h1>
-    <div>{{printf "%s" .}}</div>
-    <br>
-    <a href="/home/home.html">&#8592; Voltar a home</a>
-  </body>
+<html lang="en">
+<head>
+	<title>Ficha do paciente</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial=scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<!-- Grafico -->
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	
+</head>
+<body>
+	<div class="container">
+
+		<div class="page-header">
+			<a href="/home/home.html"><h1>Dirac <small>beta</small></h1></a>
+			<p>Sistema de auxílio médico para diagnósticos</p>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-2">
+				<div class="dropdown">
+					<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+						<span class="glyphicon glyphicon-menu-hamburger"></span> Menu
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="/edit/register.html">Cadastrar paciente</a></li>
+						<li><a href="/edit/signals.html">Triagem</a></li>
+						<li><a href="/edit/symptom.html">Inserir sintomas</a></li>
+						<li><a href="/results/results.html">Ficha do paciente</a></li>
+						<li class="divider"></li>
+						<li><a href="/home/about.html">Sobre</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="col-sm-10">
+					
+				<h2>Ficha do paciente</h2>
+				<p><b>Nome:</b> {{.Name}}</p>
+				<p><b>Data de nascimento:</b> {{.DateBirth}}</p>
+				<p><b>Cidade:</b> {{.CidadeAtual}}</p>
+				
+				<div class="row">
+					<div class="col-sm-6">
+						<h3>Sintomas</h3>
+						<ul class="list-group">
+						{{range .Sintomas}}
+							<li class="list-group-item">{{.}}</li>
+						{{end}}
+						</ul>
+					</div>
+					<div class="col-sm-6">
+						<h3>Fatores de risco</h3>
+						<ul class="list-group">
+						{{range .RiskFactors}}
+							<li class="list-group-item">{{.}}</li>
+						{{end}}
+						</ul>
+					</div>
+				</div>
+				
+				<h3>Possíveis diagnósticos</h3>
+
+				<div class="row">
+					<div class="col-sm-6">
+						<div id="diagnosticos" class="list-group">
+						{{range .Diagnosticos}}
+							<a href="/view/{{.}}" class="list-group-item">{{.}}</a>
+						{{end}}
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div id="chart_div"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+</body>
+
+<script type="text/javascript">
+	
+	// Load the Visualization API and the corechart package.
+	google.charts.load('current', {'packages':['corechart']});
+
+	// Set a callback to run when the Google Visualization API is loaded.
+	google.charts.setOnLoadCallback(drawChart);
+
+	// Callback that creates and populates a data table,
+	// instantiates the pie chart, passes in the data and
+	// draws it.
+
+	function drawChart() {
+
+		// Create the data table.
+		var data = new google.visualization.DataTable();
+		data.addColumn('string', 'Topping');
+		data.addColumn('number', 'Slices');
+		
+		/*data.addRows([
+			['Mushrooms', 3],
+			['Onions', 1],
+			['Olives', 1],
+			['Zucchini', 1],
+			['Pepperoni', 2]
+		]);*/
+
+		// Get data
+		var lis = document.getElementById("diagnosticos").getElementsByTagName("a");
+		for (var i = 0; i < lis.length; i++) {
+			var str = lis[i].innerHTML.toString();
+			str = str.replace("&lt;","") // tirar isso depois
+			str = str.replace("&gt;", "") // tirar isso depois
+			temp = str.split("-")
+			data.addRow([temp[0], parseFloat(temp[1])])
+		}
+
+		// Set chart options
+		var options = {	'width':400,
+						'height':300,
+						'pieHole':0.4
+		};
+
+		// Instantiate and draw our chart, passing in some options.
+		var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+
+
+</script>
 </html>

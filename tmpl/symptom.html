@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Triagem</title>
+	<title>Inserir sintoma</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial=scale=1">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -18,7 +18,7 @@
 
 		<div id="message" class="hidden">
 			<a href="#" class="close" data-hide="alert" aria-label="close">&times;</a>
-			<span class="glyphicon glyphicon-ok"></span> <b>Sucesso!</b> Sinais inseridos com sucesso
+			<span class="glyphicon glyphicon-ok"></span> <b>Sucesso!</b> Sintoma inserido com sucesso
 		</div>
 
 		<div class="row">
@@ -38,18 +38,16 @@
 				</div>
 			</div>
 			<div class="col-sm-10">
-				<h2>Triagem</h2>
-				<form id="form" class="form-horizontal" action="/edit/signals" method="post">
+				<h2>Inserir sintoma</h2>
+				<form id="form" class="form-horizontal" action="/edit/symptom" method="post">
 					<div class="form-group">
-						<label class="control-label col-sm-2" for="temperature">Temperatura:</label>
+						<label class="control-label col-sm-2" for="symptom">Sintoma:</label>
 						<div class="col-sm-10">
-							<input type="number" step="0.1" name="temperature" class="form-control" id="temperature" value="36" autofocus required>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="control-label col-sm-2" for="pressure">Pressão:</label>
-						<div class="col-sm-10">
-							<input type="text" name="pressure" class="form-control" id="pressure" placeholder="Insira a pressão" required>
+							<select name="body" class="form-control" id="symptom" autofocus>
+							{{range .}}
+    							<option value="{{.}}">{{.}}</option>
+							{{end}}
+  							</select>
 						</div>
 					</div>
 					<div class="form-group">
@@ -58,6 +56,8 @@
 						</div>
 					</div>
 				</form>
+				
+				<div id="result"></div>
 			</div>
 		</div>
 
@@ -80,12 +80,16 @@
 
 				// Obtem os valores do form
 				var $form = $(this),
-					t = $form.find("input[name='temperature']").val(),
-					p = $form.find("input[name='pressure']").val(),
+					term = $form.find("select[name='body']").val(),
 					url = $form.attr("action");
 
 				// Envia o dado para o server usando HTTP POST
-				var posting = $.post(url,{temperature: t, pressure: p});
+				var posting = $.post(url,{body: term});
+
+				// Exibe a resposta do servidor
+				posting.done(function(data) {
+					$('#result').empty().append(data);
+				});
 			});
 
 		</script>
