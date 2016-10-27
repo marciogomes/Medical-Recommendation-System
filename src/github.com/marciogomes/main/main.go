@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 	"html/template"
-	"strconv"
 	"strings"
+	"strconv"
 
 	"github.com/marciogomes/kg"
 	"github.com/cayleygraph/cayley"
@@ -87,29 +87,20 @@ func resultsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	results := kg.QuerySymptom(store, kg.QueryIRIs(store, p.Sintomas))
-	// ... -> variadic funcion. para appendar duas []string
-	results = append(results, kg.QueryRiskFactor(store, kg.QueryIRIs(store, p.RiskFactors))...)
+	resultsMap := kg.QuerySymptom(store, kg.QueryIRIs(store, p.Sintomas))
+	var resultsKeys []string
 
-	resultsName := kg.QueryNames(store, results)
-
-  	/* fazer um metodo para filtragem */
-	var ocorrencias map[string]int
-	var resultsSet map[string]bool
-	ocorrencias = make(map[string]int)
-	resultsSet = make(map[string]bool)
-
-	for i := range resultsName {
-		ocorrencias[resultsName[i]]++
+	for k := range resultsMap {
+		resultsKeys = append(resultsKeys, k)
 	}
 
-	p.Diagnosticos = nil; // melhorar isso, ao inves de string usar map[string]float
+	resultsNames := kg.QueryNames(store, resultsKeys)
 
-	for i := range resultsName {
-		if resultsSet[resultsName[i]] == false {
-			p.Diagnosticos = append(p.Diagnosticos, resultsName[i] + "-" + strconv.FormatFloat(float64(ocorrencias[resultsName[i]]) / float64(len(resultsName)) * 100.0, 'f', 2, 64))
-			resultsSet[resultsName[i]] = true
-		}
+	p.Diagnosticos = nil
+
+	// lembrando que resultsName e resultsKeys estao na mesma ordem
+	for i := range resultsNames {
+		p.Diagnosticos = append(p.Diagnosticos, resultsNames[i] + "-" + strconv.Itoa(resultsMap[resultsKeys[i]]))
 	}
 
 	t.Execute(w, p)
@@ -148,6 +139,6 @@ func main() {
 	http.HandleFunc("/edit/", editHandler)
 	http.HandleFunc("/results/", resultsHandler)
 	http.HandleFunc("/view/", viewHandler)
-	//http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
+	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("img/"))))
 	http.ListenAndServe(":8080", nil)
 }

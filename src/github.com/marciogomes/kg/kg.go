@@ -3,15 +3,16 @@
 package kg
 
 import (
-"fmt"
-"log"
-"os"
-"strings"
-"sort"
+	"fmt"
+	"log"
+	"os"
+	"strings"
+	"sort"
+	"strconv"
 
-"github.com/cayleygraph/cayley"
-"github.com/cayleygraph/cayley/quad"
-"github.com/cayleygraph/cayley/quad/cquads"
+	"github.com/cayleygraph/cayley"
+	"github.com/cayleygraph/cayley/quad"
+	"github.com/cayleygraph/cayley/quad/cquads"
 )
 
 type Doenca struct {
@@ -42,43 +43,56 @@ func Init() *cayley.Handle {
 	return store
 }
 
-func QuerySymptom(store *cayley.Handle, sintomas []string) []string {
-	var diagnosticos []string
+func QuerySymptom(store *cayley.Handle, sintomas []string) map[string]int {
+	var diagnosticos map[string]int
+	diagnosticos = make(map[string]int)
   	// fazendo o caminho
 	// faço Raw porque ja passo uma IRI
 	for i := range sintomas {
-		p := cayley.StartPath(store, quad.Raw(sintomas[i])).In(quad.IRI("http://health-lifesci.schema.org/MedicalSignOrSymptom"))
 
-		err := p.Iterate(nil).EachValue(nil, func(value quad.Value) {
-			nativeValue := quad.NativeOf(value)
-			diagnosticos = append(diagnosticos, fmt.Sprint(nativeValue))
-			})
-		if err != nil {
-			log.Fatalln(err)
+		// percorre os pesos
+		for j := 1; j <= 5; j++ {
+
+			p := cayley.StartPath(store, quad.Raw(sintomas[i])).In(quad.IRI("http://health-lifesci.schema.org/MedicalSignOrSymptom:" + strconv.Itoa(j)))
+
+			err := p.Iterate(nil).EachValue(nil, func(value quad.Value) {
+				nativeValue := quad.NativeOf(value)
+				diagnosticos[fmt.Sprint(nativeValue)] += j;
+				})
+			if err != nil {
+				log.Fatalln(err)
+			}
 		}
+		
 	}
 	return diagnosticos
 }
 
-/* Nao é necessario criar outros metodos, mas deixando assim pra ser mais didatico */
-
-func QueryRiskFactor(store *cayley.Handle, riskFactors []string) []string {
-	var diagnosticos []string
+func QueryRiskFactor(store *cayley.Handle, riskFactors []string) map[string]int {
+	var diagnosticos map[string]int
+	diagnosticos = make(map[string]int)
   	// fazendo o caminho
-	// faço Raw porquee ja passo uma IRI
+	// faço Raw porque ja passo uma IRI
 	for i := range riskFactors {
-		p := cayley.StartPath(store, quad.Raw(riskFactors[i])).In(quad.IRI("http://health-lifesci.schema.org/MedicalRiskFactor"))
 
-		err := p.Iterate(nil).EachValue(nil, func(value quad.Value) {
-			nativeValue := quad.NativeOf(value)
-			diagnosticos = append(diagnosticos, fmt.Sprint(nativeValue))
-			})
-		if err != nil {
-			log.Fatalln(err)
+		// percorre os pesos
+		for j := 1; j <= 5; j++ {
+
+			p := cayley.StartPath(store, quad.Raw(riskFactors[i])).In(quad.IRI("http://health-lifesci.schema.org/MedicalRiskFactor:" + strconv.Itoa(j)))
+
+			err := p.Iterate(nil).EachValue(nil, func(value quad.Value) {
+				nativeValue := quad.NativeOf(value)
+				diagnosticos[fmt.Sprint(nativeValue)] += j;
+				})
+			if err != nil {
+				log.Fatalln(err)
+			}
 		}
+		
 	}
 	return diagnosticos
 }
+
 
 // query para obter informações de uma doença
 func QueryDoenca(store *cayley.Handle, diagnostico string) Doenca {
@@ -120,30 +134,38 @@ func QueryDoenca(store *cayley.Handle, diagnostico string) Doenca {
 
 	d.Code = QueryCodeValue(store, d.Code)
 
-	p = cayley.StartPath(store, quad.Raw(diagnostico)).Out(quad.IRI("http://health-lifesci.schema.org/MedicalSignOrSymptom"))
+	// Obtem os sintomas
 
-	err = p.Iterate(nil).EachValue(nil, func(value quad.Value) {
-		nativeValue := quad.NativeOf(value)
-		d.Sintomas = append(d.Sintomas, fmt.Sprint(nativeValue))
-		})
+	for i := 1; i <= 5; i++ {
 
-	if err != nil {
-		log.Fatalln(err)
+		p = cayley.StartPath(store, quad.Raw(diagnostico)).Out(quad.IRI("http://health-lifesci.schema.org/MedicalSignOrSymptom:" + strconv.Itoa(i)))
+
+		err = p.Iterate(nil).EachValue(nil, func(value quad.Value) {
+			nativeValue := quad.NativeOf(value)
+			d.Sintomas = append(d.Sintomas, fmt.Sprint(nativeValue))
+			})
+
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
 
 	d.Sintomas = QueryNames(store, d.Sintomas)
 
-	p = cayley.StartPath(store, quad.Raw(diagnostico)).Out(quad.IRI("http://health-lifesci.schema.org/MedicalRiskFactor"))
+	for i := 1; i <= 5; i++ {
 
-	err = p.Iterate(nil).EachValue(nil, func(value quad.Value) {
-		nativeValue := quad.NativeOf(value)
-		d.RiskFactors = append(d.RiskFactors, fmt.Sprint(nativeValue))
-		})
+		p = cayley.StartPath(store, quad.Raw(diagnostico)).Out(quad.IRI("http://health-lifesci.schema.org/MedicalRiskFactor:" + strconv.Itoa(i)))
 
-	if err != nil {
-		log.Fatalln(err)
+		err = p.Iterate(nil).EachValue(nil, func(value quad.Value) {
+			nativeValue := quad.NativeOf(value)
+			d.RiskFactors = append(d.RiskFactors, fmt.Sprint(nativeValue))
+			})
+
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
-
+	
 	d.RiskFactors = QueryNames(store, d.RiskFactors)
 
 	p = cayley.StartPath(store, quad.Raw(diagnostico)).Out(quad.IRI("http://health-lifesci.schema.org/Drug"))
@@ -280,20 +302,22 @@ func QueryAll(store *cayley.Handle) []string {
 
   	// fazendo o caminho
 	// parte de todos
-	p := cayley.StartPath(store).Out(quad.IRI("http://health-lifesci.schema.org/MedicalSignOrSymptom"))
+	// percorre os pesos
+	for i := 1; i <= 5; i++ {
+		p := cayley.StartPath(store).Out(quad.IRI("http://health-lifesci.schema.org/MedicalSignOrSymptom:" + strconv.Itoa(i)))
 
-	err := p.Iterate(nil).EachValue(nil, func(value quad.Value) {
-		nativeValue := quad.NativeOf(value)
-		v := fmt.Sprint(nativeValue)
-		if sintomasSet[v] == false {
-			sintomasSet[v] = true
-			sintomas = append(sintomas, v)
+		err := p.Iterate(nil).EachValue(nil, func(value quad.Value) {
+			nativeValue := quad.NativeOf(value)
+			v := fmt.Sprint(nativeValue)
+			if sintomasSet[v] == false {
+				sintomasSet[v] = true
+				sintomas = append(sintomas, v)
+			}
+		})
+		if err != nil {
+			log.Fatalln(err)
 		}
-	})
-	if err != nil {
-		log.Fatalln(err)
 	}
-
 	sintomas = QueryNames(store, sintomas)
 	sort.Strings(sintomas)
 	
