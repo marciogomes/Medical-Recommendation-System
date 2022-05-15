@@ -3,7 +3,7 @@ Dirac is a medical recommendation system to assist the healthcare professional t
 
 Through a knowledge graph, it allows correlate various features such as symptoms, signs, patient's habits and the season and thus display a list of possible diagnoses.
 
-## Installing and usage
+## Installation and usage
 
 - Install the dependency:
 ```go
